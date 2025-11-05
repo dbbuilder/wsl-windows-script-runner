@@ -1,0 +1,38 @@
+# Python
+mcp-server/venv/
+mcp-server/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Runtime directories (don't commit queue/logs/completed/archive contents)
+queue/*
+!queue/.gitkeep
+logs/*
+!logs/.gitkeep
+completed/*
+!completed/.gitkeep
+archive/*
+!archive/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Test output
+test-output/
