@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload analysis results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: powershell-analysis-results
           path: |
