@@ -1,0 +1,79 @@
+name: PowerShell Script Analyzer
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - '**.ps1'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '**.ps1'
+  schedule:
+    - cron: '30 3 * * 1'  # Run weekly on Mondays at 3:30 AM UTC
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  analyze:
+    name: PSScriptAnalyzer
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+
+          # Get all PowerShell files
+          $scripts = Get-ChildItem -Path . -Filter *.ps1 -Recurse -File
+
+          Write-Host "Analyzing $($scripts.Count) PowerShell scripts..."
+
+          $allResults = @()
+          foreach ($script in $scripts) {
+            Write-Host "Analyzing: $($script.FullName)"
+            $results = Invoke-ScriptAnalyzer -Path $script.FullName -Recurse -ReportSummary
+            if ($results) {
+              $allResults += $results
+            }
+          }
+
+          # Display results
+          if ($allResults.Count -gt 0) {
+            Write-Host "`nFound $($allResults.Count) issue(s):"
+            $allResults | Format-Table -AutoSize
+
+            # Count by severity
+            $errors = ($allResults | Where-Object Severity -eq 'Error').Count
+            $warnings = ($allResults | Where-Object Severity -eq 'Warning').Count
+            $info = ($allResults | Where-Object Severity -eq 'Information').Count
+
+            Write-Host "`nSummary:"
+            Write-Host "  Errors: $errors"
+            Write-Host "  Warnings: $warnings"
+            Write-Host "  Information: $info"
+
+            # Fail on errors
+            if ($errors -gt 0) {
+              Write-Host "`nPowerShell script analysis failed with $errors error(s)" -ForegroundColor Red
+              exit 1
+            }
+          } else {
+            Write-Host "No issues found!" -ForegroundColor Green
+          }
+
+      - name: Upload analysis results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: powershell-analysis-results
+          path: |
+            **/*.ps1
+          retention-days: 30

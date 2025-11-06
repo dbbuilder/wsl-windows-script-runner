@@ -1,0 +1,19 @@
+# Code Owners for WSL-Windows Script Runner
+
+# Global owners - will be requested for review on all PRs
+* @dbbuilder
+
+# Security-sensitive files require review
+SECURITY.md @dbbuilder
+.github/workflows/*.yml @dbbuilder
+.gitleaks.toml @dbbuilder
+.github/dependabot.yml @dbbuilder
+
+# Core Windows scripts
+*.ps1 @dbbuilder
+
+# MCP Server
+mcp-server/ @dbbuilder
+
+# Documentation
+*.md @dbbuilder

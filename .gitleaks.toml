@@ -1,0 +1,43 @@
+# Gitleaks configuration for WSL-Windows Script Runner
+
+title = "WSL-Windows Script Runner Secret Scanning"
+
+[extend]
+# Use default gitleaks rules as base
+useDefault = true
+
+[allowlist]
+description = "Allowlist for false positives"
+paths = [
+  # Example files don't contain real secrets
+  '''examples/.*''',
+  # Documentation files
+  '''.*\.md''',
+]
+
+regexes = [
+  # Allow example/placeholder values in documentation
+  '''example-.*''',
+  '''placeholder-.*''',
+  '''your-.*-here''',
+  '''<YOUR_.*>''',
+]
+
+# Additional custom rules specific to this project
+[[rules]]
+id = "windows-api-key"
+description = "Windows API Key"
+regex = '''(?i)(windows|win)[-_]?(api[-_]?key|apikey|key)\s*[:=]\s*['\"]?([a-zA-Z0-9]{32,})['\"]?'''
+tags = ["key", "windows"]
+
+[[rules]]
+id = "mcp-token"
+description = "MCP Authentication Token"
+regex = '''(?i)mcp[-_]?(token|auth|key)\s*[:=]\s*['\"]?([a-zA-Z0-9]{32,})['\"]?'''
+tags = ["key", "mcp"]
+
+[[rules]]
+id = "powershell-credential"
+description = "PowerShell Credential or Password"
+regex = '''(?i)\$\w*(?:password|credential|secret|token)\s*=\s*['\"]([^'\"]{8,})['\"]'''
+tags = ["password", "powershell"]
